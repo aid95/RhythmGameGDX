@@ -1,33 +1,51 @@
 package kr.bugfix.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class RhythmGame extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+import kr.bugfix.game.scene.PlayGame;
+import kr.bugfix.game.system.BaseScene;
+
+public class RhythmGame extends Game {
+
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 480;
+
+	public SpriteBatch batch;
+	public OrthographicCamera camera;
+	public StretchViewport viewport;
+
 	@Override
 	public void create () {
+
+	    Gdx.input.setCatchBackKey(true);
+
+		camera = new OrthographicCamera(WIDTH, HEIGHT); 		// 화면의 크기
+	    viewport = new StretchViewport(WIDTH, HEIGHT, camera); 	// 게임 내부의 크기
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+
+		setScreen(new PlayGame(this));
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+
+	    if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
+			((BaseScene)this.getScreen()).esc();
+		}
+	    super.render();
+
 	}
 	
 	@Override
 	public void dispose () {
+
 		batch.dispose();
-		img.dispose();
+	    this.getScreen().dispose();
+
 	}
 }
