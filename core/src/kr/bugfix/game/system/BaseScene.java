@@ -16,6 +16,11 @@ public abstract class BaseScene implements Screen {
     protected SpriteBatch batch;
     protected RhythmGame app;
 
+    /**
+     * Scene의 Base를 지정합니다.
+     *
+     * @param app   기반이 될 Root Scene
+     */
     public BaseScene(RhythmGame app) {
         this.camera = app.camera;
         this.viewport = app.viewport;
