@@ -31,4 +31,7 @@ public abstract class BaseScene implements Screen {
     public abstract void init();
     public abstract void update(float delta);
     public abstract void esc();
+
+    public abstract boolean eventTouchDown(int screenX, int screenY, int pointer, int button);
+    public abstract boolean eventTouchDragged(int screenX, int screenY, int pointer);
 }

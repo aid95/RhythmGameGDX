@@ -19,10 +19,15 @@ public class PlayGame extends BaseScene {
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
      * @var rightCursorPosY 오른쪽 커서의 Y 좌표를 가집니다.
      */
-    Sprite leftCursor;
+    private Sprite leftCursor;
     private Vector2 leftCursorPos;
-    Sprite rightCursor;
+    private Sprite rightCursor;
     private Vector2 rightCursorPos;
+
+    /**
+     * 게임 화면의 가운데 위치를 가집니다.
+     */
+    private Vector2 disployCenterPos;
 
     public PlayGame(RhythmGame app) {
         super(app);
@@ -36,11 +41,14 @@ public class PlayGame extends BaseScene {
     @Override
     public void init() {
 
+        // 화면 중앙 위치를 가지는 Vector2
+        disployCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+
         // 게임 커서 위치, 스프라이트 초기화
         rightCursor = new Sprite(new Texture("right_cursor.png"));
-        rightCursorPos = new Vector2(Gdx.graphics.getWidth() - rightCursor.getWidth() - 20, Gdx.graphics.getHeight()/2 - rightCursor.getHeight()/2);
+        rightCursorPos = new Vector2(Gdx.graphics.getWidth() - rightCursor.getWidth() - 20, disployCenterPos.y - rightCursor.getHeight()/2);
         leftCursor = new Sprite(new Texture("left_cursor.png"));
-        leftCursorPos = new Vector2(20,  Gdx.graphics.getHeight()/2 - leftCursor.getHeight()/2);
+        leftCursorPos = new Vector2(20,  disployCenterPos.y - leftCursor.getHeight()/2);
 
     }
 
@@ -98,7 +106,38 @@ public class PlayGame extends BaseScene {
     @Override
     public void resize(int width, int height) {
 
+    }
 
+    @Override
+    public boolean eventTouchDown(int screenX, int screenY, int pointer, int button) {
+
+        if (screenX < disployCenterPos.x)
+        {
+            leftCursorPos.y = Gdx.graphics.getHeight() - screenY - leftCursor.getHeight()/2;
+        }
+        else
+        {
+            rightCursorPos.y = Gdx.graphics.getHeight() - screenY - rightCursor.getHeight()/2;
+        }
+
+        return true;
+
+    }
+
+    @Override
+    public boolean eventTouchDragged(int screenX, int screenY, int pointer) {
+
+        Gdx.app.log("POSITION", screenX + ", " + screenY);
+        if (screenX < disployCenterPos.x)
+        {
+            leftCursorPos.y = Gdx.graphics.getHeight() - screenY - leftCursor.getHeight()/2;
+        }
+        else
+        {
+            rightCursorPos.y = Gdx.graphics.getHeight() - screenY - rightCursor.getHeight()/2;
+        }
+
+        return true;
 
     }
 

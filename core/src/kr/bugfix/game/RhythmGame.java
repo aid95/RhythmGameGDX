@@ -13,87 +13,90 @@ import kr.bugfix.game.system.BaseScene;
 
 public class RhythmGame extends Game implements InputProcessor {
 
-	public static final int WIDTH = 800;
-	public static final int HEIGHT = 480;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 480;
 
-	public SpriteBatch batch;
-	public OrthographicCamera camera;
-	public StretchViewport viewport;
+    public SpriteBatch batch;
+    public OrthographicCamera camera;
+    public StretchViewport viewport;
 
-	@Override
-	public void create () {
+    private BaseScene currentScene;
 
-		Gdx.input.setCatchBackKey(true);
+    @Override
+    public void create () {
 
-		camera = new OrthographicCamera(WIDTH, HEIGHT);        // 화면의 크기
-		viewport = new StretchViewport(WIDTH, HEIGHT, camera);    // 게임 내부의 크기
-		batch = new SpriteBatch();
+        Gdx.input.setCatchBackKey(true);
 
-		// Scene 등록
-		setScreen(new PlayGame(this));
+        camera = new OrthographicCamera(WIDTH, HEIGHT);        // 화면의 크기
+        viewport = new StretchViewport(WIDTH, HEIGHT, camera);    // 게임 내부의 크기
+        batch = new SpriteBatch();
 
-		// 입력작업 등록
-		Gdx.input.setInputProcessor(this);
-	}
+        // Scene 등록
+        currentScene = new PlayGame(this);
+        setScreen(currentScene);
 
-	@Override
-	public void render () {
+        // 입력작업 등록
+        Gdx.input.setInputProcessor(this);
+    }
 
-	    if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
-			((BaseScene)this.getScreen()).esc();
-		}
-	    super.render();
+    @Override
+    public void render () {
 
-	}
+        if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
+            ((BaseScene)this.getScreen()).esc();
+        }
+        super.render();
 
-	/**
-	 * 사용이 끝난 자원을 반환합니다.
-	 */
-	@Override
-	public void dispose () {
+    }
 
-		batch.dispose();
-	    this.getScreen().dispose();
+    /**
+     * 사용이 끝난 자원을 반환합니다.
+     */
+    @Override
+    public void dispose () {
 
-	}
+        batch.dispose();
+        this.getScreen().dispose();
 
-	@Override
-	public boolean keyDown(int keycode) {
-		return false;
-	}
+    }
 
-	@Override
-	public boolean keyUp(int keycode) {
-		return false;
-	}
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
 
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
 
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
 
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return currentScene.eventTouchDown(screenX, screenY, pointer, button);
+    }
 
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return false;
-	}
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
 
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		return false;
-	}
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return currentScene.eventTouchDragged(screenX, screenY, pointer);
+    }
 
-	@Override
-	public boolean scrolled(int amount) {
-		return false;
-	}
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
+    }
 }
