@@ -57,7 +57,6 @@ public class PlayGame
      */
     @Override
     public void init() {
-
         // 화면 중앙 위치를 가지는 Vector2
         displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
 
@@ -82,7 +81,6 @@ public class PlayGame
      */
     @Override
     public void update(float delta) {
-
         stage.act(delta);
 
         // 터치입력 컨트롤
@@ -100,7 +98,6 @@ public class PlayGame
                 }
             }
         }
-
     }
 
     @Override

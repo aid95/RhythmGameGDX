@@ -15,7 +15,6 @@ public class RhythmGame
         extends Game
         implements InputProcessor
 {
-
     public static final int WIDTH = 2220;
     public static final int HEIGHT = 1080;
 
