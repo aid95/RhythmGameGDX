@@ -8,7 +8,9 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.RhythmGame;
 
-public abstract class BaseScene implements Screen {
+public abstract class BaseScene
+        implements Screen
+{
 
     protected Stage stage;
     protected OrthographicCamera camera;

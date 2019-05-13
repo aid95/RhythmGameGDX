@@ -11,10 +11,13 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import kr.bugfix.game.scene.PlayGame;
 import kr.bugfix.game.system.BaseScene;
 
-public class RhythmGame extends Game implements InputProcessor {
+public class RhythmGame
+        extends Game
+        implements InputProcessor
+{
 
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 480;
+    public static final int WIDTH = 2220;
+    public static final int HEIGHT = 1080;
 
     public SpriteBatch batch;
     public OrthographicCamera camera;
@@ -37,6 +40,7 @@ public class RhythmGame extends Game implements InputProcessor {
 
         // 입력작업 등록
         Gdx.input.setInputProcessor(this);
+
     }
 
     @Override
@@ -77,7 +81,7 @@ public class RhythmGame extends Game implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return currentScene.eventTouchDown(screenX, screenY, pointer, button);
+        return false;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class RhythmGame extends Game implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return currentScene.eventTouchDragged(screenX, screenY, pointer);
+        return false;
     }
 
     @Override
