@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import kr.bugfix.game.RhythmGame;
 import kr.bugfix.game.system.BaseScene;
 import kr.bugfix.game.DataObject.MusicDataInfo;
@@ -21,6 +24,9 @@ public class PlayGame
     private static final int FINGER_COUNT = 2;
     private static final int CURSOR_OFFSET = 30;
     private static final int CURSOR_SPEED = 300;
+
+    // 게임이 시작된 시간
+    private Date gameStartTime;
 
     /**
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
@@ -72,6 +78,9 @@ public class PlayGame
         // 배경화면 등록과 화면 사이즈에 맞게 늘리기
         backgroundImage = new Texture("music_bg.jpg");
         mainBackground = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
+
+        // 시작시간 초기화
+        gameStartTime = Calendar.getInstance().getTime();
     }
 
     /**
@@ -113,7 +122,6 @@ public class PlayGame
      */
     @Override
     public void render(float delta) {
-
         camera.update();
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -135,7 +143,7 @@ public class PlayGame
         stage.draw();
 
         update(delta);
-
+        createMusicNode(delta);
     }
 
     /**
@@ -183,8 +191,8 @@ public class PlayGame
     }
 
     // PRIVATE
-    private void createMusicNode() {
-
+    private void createMusicNode(float dalta) {
+        Date playTime = Calendar.getInstance().getTime() - gameStartTime;
     }
 
     /**
