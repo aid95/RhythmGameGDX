@@ -1,17 +1,18 @@
 package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-
-import org.json.JSONArray;
+import com.badlogic.gdx.utils.Json;
 
 import kr.bugfix.game.RhythmGame;
 import kr.bugfix.game.system.BaseScene;
+import kr.bugfix.game.DataObject.MusicDataInfo;
 
 public class PlayGame
         extends BaseScene
@@ -39,7 +40,7 @@ public class PlayGame
     /**
      * Json 사용을 위한 자료
      */
-    JSONArray jsonMusicData;
+    MusicDataInfo musicDataInfo;
 
     /**
      * 게임 화면의 가운데 위치를 가집니다.
@@ -50,6 +51,8 @@ public class PlayGame
         super(app);
         stage = new Stage(viewport);
         init();
+
+        readJsonFromFile("test_music.json");
     }
 
     /**
@@ -67,10 +70,8 @@ public class PlayGame
         leftCursorPos = new Vector2(CURSOR_OFFSET,  displayCenterPos.y - leftCursor.getHeight()/2);
 
         // 배경화면 등록과 화면 사이즈에 맞게 늘리기
-        backgroundImage = new Texture(Gdx.files.internal("music_bg.jpg"));
+        backgroundImage = new Texture("music_bg.jpg");
         mainBackground = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
-
-        jsonMusicData = new JSONArray();
     }
 
     /**
@@ -186,7 +187,21 @@ public class PlayGame
 
     }
 
+    /**
+     * 지정된 파일로부터 Json 데이터를 읽어옵니다. Json의 형식은 MusicDataInfo class에 의해 정해집니다.
+     *
+     * @param filepath Json파일의 위치를 의미합니다.
+     */
     private void readJsonFromFile(String filepath) {
-
+        FileHandle handle = Gdx.files.internal("test_music.json");
+        String fileContent = handle.readString();
+        Json  json = new Json();
+        json.setElementType(MusicDataInfo.class, "nodeTimeLine", Integer.class);
+        musicDataInfo = json.fromJson(MusicDataInfo.class, fileContent);
+        Gdx.app.log("JSON", "Data name = " + musicDataInfo.title);
+        for(Object e : musicDataInfo.nodeTimeLine){
+            Integer p = (Integer)e;
+            Gdx.app.log("JOJO", p.toString());
+        }
     }
 }
