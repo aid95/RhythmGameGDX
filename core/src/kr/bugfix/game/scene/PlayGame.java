@@ -10,12 +10,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 import kr.bugfix.game.RhythmGame;
+import kr.bugfix.game.datastruct.MusicNode;
 import kr.bugfix.game.system.BaseScene;
-import kr.bugfix.game.DataObject.MusicDataInfo;
+import kr.bugfix.game.datastruct.MusicDataInfo;
 
 public class PlayGame
         extends BaseScene
@@ -26,7 +29,7 @@ public class PlayGame
     private static final int CURSOR_SPEED = 300;
 
     // 게임이 시작된 시간
-    private Date gameStartTime;
+    private Long gameStartTime;
 
     /**
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
@@ -46,7 +49,12 @@ public class PlayGame
     /**
      * Json 사용을 위한 자료
      */
-    MusicDataInfo musicDataInfo;
+    private MusicDataInfo musicDataInfo;
+
+    /**
+     * 생성된 노드를 관리하기 위한 가변배열
+     */
+    private ArrayList<MusicNode> nodeArrayList;
 
     /**
      * 게임 화면의 가운데 위치를 가집니다.
@@ -80,7 +88,10 @@ public class PlayGame
         mainBackground = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
 
         // 시작시간 초기화
-        gameStartTime = Calendar.getInstance().getTime();
+        gameStartTime = System.currentTimeMillis()/1000;
+
+        // 노드의 정보를 가지는 가변배열 nodeArrayList 할당
+        nodeArrayList = new ArrayList<MusicNode>();
     }
 
     /**
@@ -137,6 +148,12 @@ public class PlayGame
             // Cursors
             batch.draw(rightCursor, rightCursorPos.x, rightCursorPos.y);
             batch.draw(leftCursor, leftCursorPos.x, leftCursorPos.y);
+
+            for (MusicNode s : nodeArrayList)
+            {
+                s.position.x += 50 * delta;
+                batch.draw(s.sprite, s.position.x, s.position.y);
+            }
         }
         batch.end();
 
@@ -192,7 +209,22 @@ public class PlayGame
 
     // PRIVATE
     private void createMusicNode(float dalta) {
-        Date playTime = Calendar.getInstance().getTime() - gameStartTime;
+        Long tsLong = System.currentTimeMillis()/1000;
+        tsLong -= gameStartTime;
+        for(Object nodeObj : musicDataInfo.nodeTimeLine){
+            Integer p = (Integer)nodeObj;
+
+            if (p > tsLong)
+            {
+                break;
+            }
+            else if (p == tsLong.intValue() || ( tsLong.intValue() <= p && p <= (tsLong.intValue() + 1) ))
+            {
+                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, displayCenterPos.y + 10)));
+                musicDataInfo.nodeTimeLine.remove(nodeObj);
+                break;
+            }
+        }
     }
 
     /**
@@ -207,9 +239,11 @@ public class PlayGame
         json.setElementType(MusicDataInfo.class, "nodeTimeLine", Integer.class);
         musicDataInfo = json.fromJson(MusicDataInfo.class, fileContent);
         Gdx.app.log("JSON", "Data name = " + musicDataInfo.title);
+        /*
         for(Object e : musicDataInfo.nodeTimeLine){
             Integer p = (Integer)e;
             Gdx.app.log("JOJO", p.toString());
         }
+        */
     }
 }

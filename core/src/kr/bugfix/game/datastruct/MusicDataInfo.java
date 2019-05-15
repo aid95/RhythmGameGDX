@@ -1,4 +1,4 @@
-package kr.bugfix.game.DataObject;
+package kr.bugfix.game.datastruct;
 
 import java.util.ArrayList;
 
