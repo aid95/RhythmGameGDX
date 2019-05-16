@@ -11,14 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
 
 import kr.bugfix.game.RhythmGame;
 import kr.bugfix.game.datastruct.MusicNode;
 import kr.bugfix.game.system.BaseScene;
 import kr.bugfix.game.datastruct.MusicDataInfo;
+import kr.bugfix.game.system.GameUtils;
 
 public class PlayGame
         extends BaseScene
@@ -29,7 +27,7 @@ public class PlayGame
     private static final int CURSOR_SPEED = 300;
 
     // 게임이 시작된 시간
-    private Long gameStartTime;
+    private Float gamePlayTime;
 
     /**
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
@@ -88,7 +86,7 @@ public class PlayGame
         mainBackground = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
 
         // 시작시간 초기화
-        gameStartTime = System.currentTimeMillis()/1000;
+        gamePlayTime = 0.0f;
 
         // 노드의 정보를 가지는 가변배열 nodeArrayList 할당
         nodeArrayList = new ArrayList<MusicNode>();
@@ -105,7 +103,7 @@ public class PlayGame
         stage.act(delta);
 
         // 터치입력 컨트롤
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < FINGER_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
             {
@@ -151,7 +149,11 @@ public class PlayGame
 
             for (MusicNode s : nodeArrayList)
             {
-                s.position.x += 50 * delta;
+                if (s.type == MusicNode.TYPE_NOMAR_RIGHT)
+                    s.position.x += 50 * delta;
+                else
+                    s.position.x -= 50 * delta;
+
                 batch.draw(s.sprite, s.position.x, s.position.y);
             }
         }
@@ -208,19 +210,15 @@ public class PlayGame
     }
 
     // PRIVATE
-    private void createMusicNode(float dalta) {
-        Long tsLong = System.currentTimeMillis()/1000;
-        tsLong -= gameStartTime;
+    private void createMusicNode(float delta) {
+        gamePlayTime += delta;
+        int typeFlag = MusicNode.TYPE_NOMAR_LEFT;
         for(Object nodeObj : musicDataInfo.nodeTimeLine){
-            Integer p = (Integer)nodeObj;
-
-            if (p > tsLong)
+            float p = (Long)nodeObj;
+            p /= 1000;
+            if (p >= gamePlayTime && (p < (gamePlayTime + 0.1)))
             {
-                break;
-            }
-            else if (p == tsLong.intValue() || ( tsLong.intValue() <= p && p <= (tsLong.intValue() + 1) ))
-            {
-                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, displayCenterPos.y + 10)));
+                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, GameUtils.getInstance().getRandomInt(Gdx.graphics.getHeight())), typeFlag));
                 musicDataInfo.nodeTimeLine.remove(nodeObj);
                 break;
             }
@@ -236,14 +234,8 @@ public class PlayGame
         FileHandle handle = Gdx.files.internal("test_music.json");
         String fileContent = handle.readString();
         Json  json = new Json();
-        json.setElementType(MusicDataInfo.class, "nodeTimeLine", Integer.class);
+        json.setElementType(MusicDataInfo.class, "nodeTimeLine", Long.class);
         musicDataInfo = json.fromJson(MusicDataInfo.class, fileContent);
         Gdx.app.log("JSON", "Data name = " + musicDataInfo.title);
-        /*
-        for(Object e : musicDataInfo.nodeTimeLine){
-            Integer p = (Integer)e;
-            Gdx.app.log("JOJO", p.toString());
-        }
-        */
     }
 }

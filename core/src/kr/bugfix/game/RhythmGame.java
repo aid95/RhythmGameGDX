@@ -29,7 +29,7 @@ public class RhythmGame
 
         Gdx.input.setCatchBackKey(true);
 
-        camera = new OrthographicCamera(WIDTH, HEIGHT);        // 화면의 크기
+        camera = new OrthographicCamera(WIDTH, HEIGHT);           // 화면의 크기
         viewport = new StretchViewport(WIDTH, HEIGHT, camera);    // 게임 내부의 크기
         batch = new SpriteBatch();
 
@@ -44,12 +44,10 @@ public class RhythmGame
 
     @Override
     public void render () {
-
         if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
             ((BaseScene)this.getScreen()).esc();
         }
         super.render();
-
     }
 
     /**
