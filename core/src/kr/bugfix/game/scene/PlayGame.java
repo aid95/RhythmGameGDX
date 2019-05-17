@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
@@ -26,7 +27,7 @@ public class PlayGame
     private static final int CURSOR_OFFSET = 30;
     private static final int CURSOR_SPEED = 300;
 
-    // 게임이 시작된 시간
+    // 게임이 진행된 시간
     private Float gamePlayTime;
 
     /**
@@ -45,7 +46,7 @@ public class PlayGame
     private TextureRegion mainBackground;
 
     /**
-     * Json 사용을 위한 자료
+     * Json 사용을 위한 클래스
      */
     private MusicDataInfo musicDataInfo;
 
@@ -94,7 +95,7 @@ public class PlayGame
 
     /**
      * render에 의해 호출되며 draw와 update의 작업을 분리하기 위해 작성하였습니다.
-     * update에서는 데이터의 갱신을 담당하게 됩니다. 이는 render로 부터 호출됩니다.
+     * update에서는 데이터의 갱신을 담당하게 됩니다. 이 함수는 render로 부터 호출됩니다.
      *
      * @param delta 이전 화면과 현재 화면까지의 갱신된 시간입니다.
      */
@@ -102,7 +103,14 @@ public class PlayGame
     public void update(float delta) {
         stage.act(delta);
 
-        // 터치입력 컨트롤
+        moveCursorWithTouche(delta);
+        checkBetweenCursorAndNode();
+    }
+
+    /**
+     * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축을 움직입니다.
+     */
+    public void moveCursorWithTouche(float delta) {
         for (int i = 0; i < FINGER_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
@@ -111,12 +119,15 @@ public class PlayGame
                 {
                     leftCursorPos.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (leftCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
-                else
-                {
+                else {
                     rightCursorPos.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (rightCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
             }
         }
+    }
+
+    public void checkBetweenCursorAndNode() {
+
     }
 
     @Override
@@ -147,14 +158,18 @@ public class PlayGame
             batch.draw(rightCursor, rightCursorPos.x, rightCursorPos.y);
             batch.draw(leftCursor, leftCursorPos.x, leftCursorPos.y);
 
-            for (MusicNode s : nodeArrayList)
+            for (MusicNode node : nodeArrayList)
             {
-                if (s.type == MusicNode.TYPE_NOMAR_RIGHT)
-                    s.position.x += 50 * delta;
-                else
-                    s.position.x -= 50 * delta;
+                if (node.type == MusicNode.TYPE_NOMAR_RIGHT)
+                {
+                    node.position.x += 50 * delta;
+                }
+                else {
+                    node.position.x -= 50 * delta;
+                }
 
-                batch.draw(s.sprite, s.position.x, s.position.y);
+
+                batch.draw(node.sprite, node.position.x, node.position.y);
             }
         }
         batch.end();
