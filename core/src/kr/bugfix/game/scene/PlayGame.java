@@ -35,9 +35,9 @@ public class PlayGame
      * @var rightCursorPosY 오른쪽 커서의 Y 좌표를 가집니다.
      */
     private Sprite leftCursor;
-    private Vector2 leftCursorPos;
+    public Rectangle leftCursorRect;
     private Sprite rightCursor;
-    private Vector2 rightCursorPos;
+    public Rectangle rightCursorRect;
 
     /**
      * 배경화면
@@ -76,11 +76,19 @@ public class PlayGame
         // 화면 중앙 위치를 가지는 Vector2
         displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
 
-        // 게임 커서 위치, 스프라이트 초기화
+        // 게임 커서 범위, 스프라이트 초기화
         rightCursor = new Sprite(new Texture("right_cursor.png"));
-        rightCursorPos = new Vector2(Gdx.graphics.getWidth() - rightCursor.getWidth() - CURSOR_OFFSET, displayCenterPos.y - rightCursor.getHeight()/2);
+        rightCursorRect = new Rectangle();
+        rightCursorRect.x = Gdx.graphics.getWidth() - rightCursor.getWidth() - CURSOR_OFFSET;
+        rightCursorRect.y = rightCursor.getHeight()/2 - displayCenterPos.y;
+        rightCursorRect.width = rightCursor.getWidth();
+        rightCursorRect.height = rightCursor.getHeight();
+
         leftCursor = new Sprite(new Texture("left_cursor.png"));
-        leftCursorPos = new Vector2(CURSOR_OFFSET,  displayCenterPos.y - leftCursor.getHeight()/2);
+        leftCursorRect.x = CURSOR_OFFSET;
+        leftCursorRect.y = leftCursor.getHeight()/2 - displayCenterPos.y;
+        leftCursorRect.width = leftCursor.getWidth();
+        leftCursorRect.height = leftCursor.getHeight()
 
         // 배경화면 등록과 화면 사이즈에 맞게 늘리기
         backgroundImage = new Texture("music_bg.jpg");
@@ -105,12 +113,15 @@ public class PlayGame
 
         moveCursorWithTouche(delta);
         checkBetweenCursorAndNode();
+        createMusicNode(delta);
+        hitNodeCheck(delta);
+        moveNodePosition(delta);
     }
 
     /**
      * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축을 움직입니다.
      */
-    public void moveCursorWithTouche(float delta) {
+    private void moveCursorWithTouche(float delta) {
         for (int i = 0; i < FINGER_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
@@ -126,8 +137,23 @@ public class PlayGame
         }
     }
 
-    public void checkBetweenCursorAndNode() {
-
+    private void hitNodeCheck(float delta) {
+        for (MusicNode node : nodeArrayList)
+        {
+            if (node.type == TYPE_NOMAR_RIGHT)
+            {
+                if (node.rect.overlape(rightCursorRect))
+                {
+                    nodeArrayList.remove(node);
+                }
+            }
+            else {
+                if (node.rect.overlape(leftCursorRect))
+                {
+                    nodeArrayList.remove(node);
+                }
+            }
+        }
     }
 
     @Override
@@ -160,16 +186,7 @@ public class PlayGame
 
             for (MusicNode node : nodeArrayList)
             {
-                if (node.type == MusicNode.TYPE_NOMAR_RIGHT)
-                {
-                    node.position.x += 50 * delta;
-                }
-                else {
-                    node.position.x -= 50 * delta;
-                }
-
-
-                batch.draw(node.sprite, node.position.x, node.position.y);
+                batch.draw(node.getNodeSprite(), node.position.x, node.position.y);
             }
         }
         batch.end();
@@ -177,7 +194,6 @@ public class PlayGame
         stage.draw();
 
         update(delta);
-        createMusicNode(delta);
     }
 
     /**
@@ -224,18 +240,29 @@ public class PlayGame
 
     }
 
-    // PRIVATE
     private void createMusicNode(float delta) {
         gamePlayTime += delta;
-        int typeFlag = MusicNode.TYPE_NOMAR_LEFT;
         for(Object nodeObj : musicDataInfo.nodeTimeLine){
             float p = (Long)nodeObj;
             p /= 1000;
-            if (p >= gamePlayTime && (p < (gamePlayTime + 0.1)))
+            if (gamePlayTime <= p && (p < (gamePlayTime + 0.1)))
             {
                 nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, GameUtils.getInstance().getRandomInt(Gdx.graphics.getHeight())), typeFlag));
                 musicDataInfo.nodeTimeLine.remove(nodeObj);
                 break;
+            }
+        }
+    }
+
+    private void moveNodePosition(float delta) {
+        for (MusicNode node : nodeArrayList)
+        {
+            if (node.type == MusicNode.TYPE_NOMAR_RIGHT)
+            {
+                node.position.x += 50 * delta;
+            }
+            else {
+                node.position.x -= 50 * delta;
             }
         }
     }
