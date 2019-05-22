@@ -23,7 +23,7 @@ public class PlayGame
         extends BaseScene
 {
     // Sprite 사용하기!!!!
-    private static final int FINGER_COUNT = 2;
+    private static final int MAX_TOUCH_COUNT = 2;
     private static final int CURSOR_OFFSET = 30;
     private static final int CURSOR_SPEED = 300;
 
@@ -83,7 +83,6 @@ public class PlayGame
         rightCursorRect.y = rightCursor.getHeight()/2 - displayCenterPos.y;
         rightCursorRect.width = rightCursor.getWidth();
         rightCursorRect.height = rightCursor.getHeight();
-
         leftCursor = new Sprite(new Texture("left_cursor.png"));
         leftCursorRect.x = CURSOR_OFFSET;
         leftCursorRect.y = leftCursor.getHeight()/2 - displayCenterPos.y;
@@ -111,18 +110,17 @@ public class PlayGame
     public void update(float delta) {
         stage.act(delta);
 
-        moveCursorWithTouche(delta);
-        checkBetweenCursorAndNode();
-        createMusicNode(delta);
-        hitNodeCheck(delta);
-        moveNodePosition(delta);
+        moveCursorWithTouche(delta); // 커서이동
+        createMusicNode(delta);      // 음악노드 생성
+        hitNodeCheck(delta);         // 노드와 커서의 충돌처리
+        moveNodePosition(delta);     // 노드의 x축 이동
     }
 
     /**
      * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축을 움직입니다.
      */
     private void moveCursorWithTouche(float delta) {
-        for (int i = 0; i < FINGER_COUNT; i++)
+        for (int i = 0; i < MAX_TOUCH_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
             {
