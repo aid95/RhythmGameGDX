@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class MusicNode
 {
-    public static final int TYPE_NOMAR_RIGHT = 0;
-    public static final int TYPE_NOMAR_LEFT = 1;
+    public static final int DIRECTION_TYPE_RIGHT = 0;
+    public static final int DIRECTION_TYPE_LEFT = 1;
 
     public static Sprite leftNodeSprite = new Sprite(new Texture("left_cursor.png"));
     public static Sprite rightNodeSprite = new Sprite(new Texture("right_cursor.png"));
@@ -18,6 +18,7 @@ public class MusicNode
     public int type;
 
     public MusicNode(Vector2 position, int type) {
+
         // Set bound box size
         this.rect = new Rectangle();
         this.rect.x = position.x;
@@ -30,7 +31,8 @@ public class MusicNode
     }
 
     public Sprite getNodeSprite() {
-        if (type == TYPE_NOMAR_LEFT)
+
+        if (type == DIRECTION_TYPE_LEFT)
         {
             return leftNodeSprite;
         }
@@ -38,6 +40,8 @@ public class MusicNode
     }
 
     public void setPosition(int x, int y) {
-        position.set(x, y);
+
+        rect.x = x;
+        rect.y = y;
     }
 }

@@ -1,6 +1,7 @@
 package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ public class PlayGame
     private Vector2 displayCenterPos;
 
     public PlayGame(RhythmGame app) {
+
         super(app);
         stage = new Stage(viewport);
         init();
@@ -73,6 +76,7 @@ public class PlayGame
      */
     @Override
     public void init() {
+
         // 화면 중앙 위치를 가지는 Vector2
         displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
 
@@ -84,10 +88,11 @@ public class PlayGame
         rightCursorRect.width = rightCursor.getWidth();
         rightCursorRect.height = rightCursor.getHeight();
         leftCursor = new Sprite(new Texture("left_cursor.png"));
+        leftCursorRect = new Rectangle();
         leftCursorRect.x = CURSOR_OFFSET;
         leftCursorRect.y = leftCursor.getHeight()/2 - displayCenterPos.y;
         leftCursorRect.width = leftCursor.getWidth();
-        leftCursorRect.height = leftCursor.getHeight()
+        leftCursorRect.height = leftCursor.getHeight();
 
         // 배경화면 등록과 화면 사이즈에 맞게 늘리기
         backgroundImage = new Texture("music_bg.jpg");
@@ -108,6 +113,7 @@ public class PlayGame
      */
     @Override
     public void update(float delta) {
+
         stage.act(delta);
 
         moveCursorWithTouche(delta); // 커서이동
@@ -117,40 +123,51 @@ public class PlayGame
     }
 
     /**
-     * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축을 움직입니다.
+     * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축으로 움직입니다.
      */
     private void moveCursorWithTouche(float delta) {
+
         for (int i = 0; i < MAX_TOUCH_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
             {
                 if (Gdx.input.getX(i) < displayCenterPos.x)
                 {
-                    leftCursorPos.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (leftCursor.getHeight()/2) + (CURSOR_SPEED*delta);
+                    leftCursorRect.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (leftCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
                 else {
-                    rightCursorPos.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (rightCursor.getHeight()/2) + (CURSOR_SPEED*delta);
+                    rightCursorRect.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (rightCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
             }
         }
     }
 
     private void hitNodeCheck(float delta) {
+
+        ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
+
         for (MusicNode node : nodeArrayList)
         {
-            if (node.type == TYPE_NOMAR_RIGHT)
+            if (node.type == MusicNode.DIRECTION_TYPE_RIGHT)
             {
-                if (node.rect.overlape(rightCursorRect))
+                if (node.rect.overlaps(rightCursorRect))
                 {
-                    nodeArrayList.remove(node);
+                    // nodeArrayList.remove(node);
+                    removeNodes.add(node);
                 }
             }
             else {
-                if (node.rect.overlape(leftCursorRect))
+                if (node.rect.overlaps(leftCursorRect))
                 {
-                    nodeArrayList.remove(node);
+                    // nodeArrayList.remove(node);
+                    removeNodes.add(node);
                 }
             }
+        }
+
+        for (MusicNode node : removeNodes)
+        {
+            nodeArrayList.remove(node);
         }
     }
 
@@ -166,6 +183,7 @@ public class PlayGame
      */
     @Override
     public void render(float delta) {
+
         camera.update();
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -179,12 +197,12 @@ public class PlayGame
             batch.draw(mainBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             // Cursors
-            batch.draw(rightCursor, rightCursorPos.x, rightCursorPos.y);
-            batch.draw(leftCursor, leftCursorPos.x, leftCursorPos.y);
+            batch.draw(rightCursor, rightCursorRect.x, rightCursorRect.y);
+            batch.draw(leftCursor, leftCursorRect.x, leftCursorRect.y);
 
             for (MusicNode node : nodeArrayList)
             {
-                batch.draw(node.getNodeSprite(), node.position.x, node.position.y);
+                batch.draw(node.getNodeSprite(), node.rect.x, node.rect.y);
             }
         }
         batch.end();
@@ -239,13 +257,14 @@ public class PlayGame
     }
 
     private void createMusicNode(float delta) {
+
         gamePlayTime += delta;
         for(Object nodeObj : musicDataInfo.nodeTimeLine){
             float p = (Long)nodeObj;
             p /= 1000;
             if (gamePlayTime <= p && (p < (gamePlayTime + 0.1)))
             {
-                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, GameUtils.getInstance().getRandomInt(Gdx.graphics.getHeight())), typeFlag));
+                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, GameUtils.getInstance().getRandomInt(Gdx.graphics.getHeight())), 1));
                 musicDataInfo.nodeTimeLine.remove(nodeObj);
                 break;
             }
@@ -253,14 +272,15 @@ public class PlayGame
     }
 
     private void moveNodePosition(float delta) {
+
         for (MusicNode node : nodeArrayList)
         {
-            if (node.type == MusicNode.TYPE_NOMAR_RIGHT)
+            if (node.type == MusicNode.DIRECTION_TYPE_RIGHT)
             {
-                node.position.x += 50 * delta;
+                node.rect.x += 50 * delta;
             }
             else {
-                node.position.x -= 50 * delta;
+                node.rect.x -= 50 * delta;
             }
         }
     }
@@ -271,6 +291,7 @@ public class PlayGame
      * @param filepath Json파일의 위치를 의미합니다.
      */
     private void readJsonFromFile(String filepath) {
+
         FileHandle handle = Gdx.files.internal("test_music.json");
         String fileContent = handle.readString();
         Json  json = new Json();
