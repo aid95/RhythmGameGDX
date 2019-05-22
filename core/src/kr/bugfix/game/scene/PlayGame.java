@@ -1,7 +1,6 @@
 package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,14 +9,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
 
 import kr.bugfix.game.RhythmGame;
 import kr.bugfix.game.datastruct.MusicNode;
-import kr.bugfix.game.system.BaseScene;
 import kr.bugfix.game.datastruct.MusicDataInfo;
 import kr.bugfix.game.system.GameUtils;
 
@@ -62,13 +59,9 @@ public class PlayGame
      */
     private Vector2 displayCenterPos;
 
-    public PlayGame(RhythmGame app) {
-
-        super(app);
+    public PlayGame() {
+        super();
         stage = new Stage(viewport);
-        init();
-
-        readJsonFromFile("test_music.json");
     }
 
     /**
@@ -103,6 +96,8 @@ public class PlayGame
 
         // 노드의 정보를 가지는 가변배열 nodeArrayList 할당
         nodeArrayList = new ArrayList<MusicNode>();
+
+        readJsonFromFile("test_music.json");
     }
 
     /**

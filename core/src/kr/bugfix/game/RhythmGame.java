@@ -9,20 +9,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.scene.PlayGame;
-import kr.bugfix.game.system.BaseScene;
+import kr.bugfix.game.scene.BaseScene;
+import kr.bugfix.game.system.SceneManager;
 
 public class RhythmGame
         extends Game
         implements InputProcessor
 {
-    public static final int WIDTH = 2220;
-    public static final int HEIGHT = 1080;
+    private static final int WIDTH = 2220;
+    private static final int HEIGHT = 1080;
 
     public SpriteBatch batch;
     public OrthographicCamera camera;
     public StretchViewport viewport;
-
-    private BaseScene currentScene;
 
     @Override
     public void create () {
@@ -33,17 +32,20 @@ public class RhythmGame
         viewport = new StretchViewport(WIDTH, HEIGHT, camera);    // 게임 내부의 크기
         batch = new SpriteBatch();
 
+        // 진입점이 되는 Scene을 지정
+        SceneManager.getInstance().setEntryScene(this);
+
         // Scene 등록
-        currentScene = new PlayGame(this);
-        setScreen(currentScene);
+        BaseScene nextScene = new PlayGame();
+        setScreen(nextScene);
 
         // 입력작업 등록
         Gdx.input.setInputProcessor(this);
-
     }
 
     @Override
     public void render () {
+
         if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
             ((BaseScene)this.getScreen()).esc();
         }
@@ -58,7 +60,6 @@ public class RhythmGame
 
         batch.dispose();
         this.getScreen().dispose();
-
     }
 
     @Override

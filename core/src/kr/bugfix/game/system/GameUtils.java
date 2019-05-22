@@ -7,7 +7,6 @@ public class GameUtils
     private Random random;
     private static GameUtils instance = null;
 
-    // 외부에서 만들지맛!
     private GameUtils() {
         random = new Random();
     }

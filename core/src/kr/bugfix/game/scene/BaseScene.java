@@ -1,4 +1,4 @@
-package kr.bugfix.game.system;
+package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.RhythmGame;
+import kr.bugfix.game.system.SceneManager;
 
 public abstract class BaseScene
         implements Screen
@@ -23,11 +24,13 @@ public abstract class BaseScene
      *
      * @param app   기반이 될 Root Scene
      */
-    public BaseScene(RhythmGame app) {
+    public BaseScene() {
+        RhythmGame entryScene = (RhythmGame) SceneManager.getInstance().getEntryScene();
+
         this.camera = app.camera;
         this.viewport = app.viewport;
         this.batch = app.batch;
-        this.app = app;
+        this.app = entryScene;
     }
 
     public abstract void init();
