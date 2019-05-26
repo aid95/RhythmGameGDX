@@ -10,8 +10,8 @@ public class MusicNode
     public static final int DIRECTION_TYPE_RIGHT = 0;
     public static final int DIRECTION_TYPE_LEFT = 1;
 
-    public static Sprite leftNodeSprite = new Sprite(new Texture("left_cursor.png"));
-    public static Sprite rightNodeSprite = new Sprite(new Texture("right_cursor.png"));
+    public static Sprite leftNodeSprite = new Sprite(new Texture("music_node_left.png"));
+    public static Sprite rightNodeSprite = new Sprite(new Texture("music_node_right.png"));
 
     public Rectangle rect;
 

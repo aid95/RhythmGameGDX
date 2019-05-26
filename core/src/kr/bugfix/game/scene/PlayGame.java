@@ -1,6 +1,8 @@
 package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,6 +27,7 @@ public class PlayGame
     private static final int MAX_TOUCH_COUNT = 2;
     private static final int CURSOR_OFFSET = 30;
     private static final int CURSOR_SPEED = 300;
+    private static final int NODE_SPEED = 50;
 
     // 게임이 진행된 시간
     private Float gamePlayTime;
@@ -59,9 +62,24 @@ public class PlayGame
      */
     private Vector2 displayCenterPos;
 
+    /**
+     * 배경음악을 수행할 Music 객체
+     */
+    private Music music;
+
+    private float delayStartMusic;
+    private boolean isStart;
+
+    /**
+     * ############################################
+     * #               FUNCTIONS                  #
+     * ############################################
+     */
+
     public PlayGame() {
         super();
         stage = new Stage(viewport);
+        init();
     }
 
     /**
@@ -69,6 +87,7 @@ public class PlayGame
      */
     @Override
     public void init() {
+        music = Gdx.audio.newMusic(Gdx.files.internal("01-Courtesy.mp3"));
 
         // 화면 중앙 위치를 가지는 Vector2
         displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
@@ -97,7 +116,8 @@ public class PlayGame
         // 노드의 정보를 가지는 가변배열 nodeArrayList 할당
         nodeArrayList = new ArrayList<MusicNode>();
 
-        readJsonFromFile("test_music.json");
+        readJsonFromFile("01-Courtesy.json");
+        delayStartMusic = displayCenterPos.x - CURSOR_OFFSET;
     }
 
     /**
@@ -121,7 +141,6 @@ public class PlayGame
      * 화면 중앙을 기준으로 터치를 구분하여 왼쪽 오른쪽 커서의 Y축으로 움직입니다.
      */
     private void moveCursorWithTouche(float delta) {
-
         for (int i = 0; i < MAX_TOUCH_COUNT; i++)
         {
             if (Gdx.input.isTouched(i))
@@ -138,7 +157,6 @@ public class PlayGame
     }
 
     private void hitNodeCheck(float delta) {
-
         ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
 
         for (MusicNode node : nodeArrayList)
@@ -178,6 +196,15 @@ public class PlayGame
      */
     @Override
     public void render(float delta) {
+        if ( !isStart )
+        {
+            delayStartMusic -= CURSOR_SPEED * delta;
+            if (delayStartMusic <= 0)
+            {
+                isStart = true;
+                music.play();
+            }
+        }
 
         camera.update();
 
@@ -252,7 +279,6 @@ public class PlayGame
     }
 
     private void createMusicNode(float delta) {
-
         gamePlayTime += delta;
         for(Object nodeObj : musicDataInfo.nodeTimeLine){
             float p = (Long)nodeObj;
@@ -267,16 +293,30 @@ public class PlayGame
     }
 
     private void moveNodePosition(float delta) {
+        ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
 
         for (MusicNode node : nodeArrayList)
         {
             if (node.type == MusicNode.DIRECTION_TYPE_RIGHT)
             {
-                node.rect.x += 50 * delta;
+                node.rect.x += NODE_SPEED * delta;
+                if (node.rect.x > Gdx.graphics.getWidth())
+                {
+                    removeNodes.add(node);
+                }
             }
             else {
-                node.rect.x -= 50 * delta;
+                node.rect.x -= NODE_SPEED * delta;
+                if (node.rect.x < 0)
+                {
+                    removeNodes.add(node);
+                }
             }
+        }
+
+        for (MusicNode node : removeNodes)
+        {
+            nodeArrayList.remove(node);
         }
     }
 
@@ -287,7 +327,7 @@ public class PlayGame
      */
     private void readJsonFromFile(String filepath) {
 
-        FileHandle handle = Gdx.files.internal("test_music.json");
+        FileHandle handle = Gdx.files.internal(filepath);
         String fileContent = handle.readString();
         Json  json = new Json();
         json.setElementType(MusicDataInfo.class, "nodeTimeLine", Long.class);

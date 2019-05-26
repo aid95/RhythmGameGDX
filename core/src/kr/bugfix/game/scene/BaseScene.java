@@ -27,9 +27,9 @@ public abstract class BaseScene
     public BaseScene() {
         RhythmGame entryScene = (RhythmGame) SceneManager.getInstance().getEntryScene();
 
-        this.camera = app.camera;
-        this.viewport = app.viewport;
-        this.batch = app.batch;
+        this.camera = entryScene.camera;
+        this.viewport = entryScene.viewport;
+        this.batch = entryScene.batch;
         this.app = entryScene;
     }
 

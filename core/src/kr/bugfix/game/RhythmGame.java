@@ -16,6 +16,7 @@ public class RhythmGame
         extends Game
         implements InputProcessor
 {
+
     private static final int WIDTH = 2220;
     private static final int HEIGHT = 1080;
 
@@ -25,7 +26,6 @@ public class RhythmGame
 
     @Override
     public void create () {
-
         Gdx.input.setCatchBackKey(true);
 
         camera = new OrthographicCamera(WIDTH, HEIGHT);           // 화면의 크기
@@ -45,7 +45,6 @@ public class RhythmGame
 
     @Override
     public void render () {
-
         if (Gdx.input.isKeyPressed(Input.Keys.BACK) || Gdx.input.isButtonPressed(Input.Buttons.BACK)) {
             ((BaseScene)this.getScreen()).esc();
         }
@@ -57,7 +56,6 @@ public class RhythmGame
      */
     @Override
     public void dispose () {
-
         batch.dispose();
         this.getScreen().dispose();
     }
@@ -101,4 +99,5 @@ public class RhythmGame
     public boolean scrolled(int amount) {
         return false;
     }
+
 }
