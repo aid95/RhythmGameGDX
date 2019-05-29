@@ -2,23 +2,13 @@ package kr.bugfix.game.datastruct;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
-public class MusicNode
+public class AttackNode
     extends Node
 {
-    public static final int DIRECTION_TYPE_RIGHT = 0;
-    public static final int DIRECTION_TYPE_LEFT = 1;
-
-    public static Sprite leftNodeSprite = new Sprite(new Texture("music_node_left.png"));
-    public static Sprite rightNodeSprite = new Sprite(new Texture("music_node_right.png"));
-
-    public Rectangle rect;
-
-    public int type;
-
-    public MusicNode(Vector2 position, int type) {
+    public AttackNode(Vector2 position, int type) {
         // Set bound box size
         this.rect = new Rectangle();
         this.rect.x = position.x;
@@ -31,8 +21,7 @@ public class MusicNode
     }
 
     public Sprite getNodeSprite() {
-        if (type == DIRECTION_TYPE_LEFT)
-        {
+        if (type == DIRECTION_TYPE_LEFT) {
             return leftNodeSprite;
         }
         return rightNodeSprite;
@@ -42,6 +31,7 @@ public class MusicNode
 
         rect.x = x;
         rect.y = y;
+
     }
 
     public Vector2 getCenterPosition() {

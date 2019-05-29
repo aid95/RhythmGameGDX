@@ -1,5 +1,7 @@
 package kr.bugfix.game.system;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class GameEnv
 {
     private static GameEnv instance = null;
@@ -17,9 +19,8 @@ public class GameEnv
      * 싱글톤을 유지하기 위해 외부에서 GameEnv를 생성할 수 없습니다.
      */
     private GameEnv() {
-
         gameSpeed = 1;
-        score = 0;
+        score = new Vector2();
     }
 
     /**
@@ -39,17 +40,35 @@ public class GameEnv
      * 가장 최근에한 게임의 점수를 가지고 있습니다. Scene이 변경되더라도 유지되는 상황을 위해 존재합니다.
      * ex) 게임씬에서 얻은 점수가 결과씬에서 출력
      */
-    private int score;
+    private Vector2 score;
 
-    public int getScore() {
+    public Vector2 getScore() {
         return score;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setScore(int score, int playerId) {
+        if (playerId == 0)
+            this.score.x = score;
+        else
+            this.score.y = score;
     }
 
-    public void addScore(int point) { this.score += point; }
+    public void addScore(int point, int playerId) {
+        if (playerId == 0)
+            this.score.x += point;
+        else
+            this.score.y += point;
+    }
 
-    public void subScore(int point) { this.score -= point; }
+    public void subScore(int point, int playerId) {
+        if (playerId == 0)
+            this.score.x -= point;
+        else
+            this.score.y -= point;
+    }
+
+    public void resetScore() {
+        score.x = 0;
+        score.y = 0;
+    }
 }

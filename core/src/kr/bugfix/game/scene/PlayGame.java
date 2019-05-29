@@ -1,8 +1,8 @@
 package kr.bugfix.game.scene;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,12 +12,15 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Json;
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 
 import java.util.ArrayList;
 
-import kr.bugfix.game.RhythmGame;
+import kr.bugfix.game.datastruct.AttackNode;
 import kr.bugfix.game.datastruct.MusicNode;
 import kr.bugfix.game.datastruct.MusicDataInfo;
+import kr.bugfix.game.datastruct.Node;
+import kr.bugfix.game.system.GameEnv;
 import kr.bugfix.game.system.GameUtils;
 
 public class PlayGame
@@ -27,10 +30,12 @@ public class PlayGame
     private static final int MAX_TOUCH_COUNT = 2;
     private static final int CURSOR_OFFSET = 30;
     private static final int CURSOR_SPEED = 300;
-    private static final int NODE_SPEED = 50;
+    private static final int NODE_SPEED = 1000;
+    private static final int ATTACK_NODE_SPEED = 1100;
 
     // 게임이 진행된 시간
     private Float gamePlayTime;
+    private Float lastCreateNodeTime;
 
     /**
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
@@ -56,6 +61,7 @@ public class PlayGame
      * 생성된 노드를 관리하기 위한 가변배열
      */
     private ArrayList<MusicNode> nodeArrayList;
+    private ArrayList<AttackNode> attackNodeArrayList;
 
     /**
      * 게임 화면의 가운데 위치를 가집니다.
@@ -75,7 +81,6 @@ public class PlayGame
      * #               FUNCTIONS                  #
      * ############################################
      */
-
     public PlayGame() {
         super();
         stage = new Stage(viewport);
@@ -112,9 +117,11 @@ public class PlayGame
 
         // 시작시간 초기화
         gamePlayTime = 0.0f;
+        lastCreateNodeTime = 0.0f;
 
         // 노드의 정보를 가지는 가변배열 nodeArrayList 할당
         nodeArrayList = new ArrayList<MusicNode>();
+        attackNodeArrayList = new ArrayList<AttackNode>();
 
         readJsonFromFile("01-Courtesy.json");
         delayStartMusic = displayCenterPos.x - CURSOR_OFFSET;
@@ -135,6 +142,7 @@ public class PlayGame
         createMusicNode(delta);      // 음악노드 생성
         hitNodeCheck(delta);         // 노드와 커서의 충돌처리
         moveNodePosition(delta);     // 노드의 x축 이동
+        moveAttackNodePosition(delta);
     }
 
     /**
@@ -156,8 +164,13 @@ public class PlayGame
         }
     }
 
+    /**
+     * 노드의 충돌을 검사합니다.
+     * @param delta
+     */
     private void hitNodeCheck(float delta) {
         ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
+        ArrayList<AttackNode> removeAttackNodes = new ArrayList<AttackNode>();
 
         for (MusicNode node : nodeArrayList)
         {
@@ -165,15 +178,46 @@ public class PlayGame
             {
                 if (node.rect.overlaps(rightCursorRect))
                 {
-                    // nodeArrayList.remove(node);
                     removeNodes.add(node);
+                    attackNodeArrayList.add(new AttackNode(node.getCenterPosition(), MusicNode.DIRECTION_TYPE_LEFT));
                 }
             }
             else {
                 if (node.rect.overlaps(leftCursorRect))
                 {
-                    // nodeArrayList.remove(node);
                     removeNodes.add(node);
+                    attackNodeArrayList.add(new AttackNode(node.getCenterPosition(), MusicNode.DIRECTION_TYPE_RIGHT));
+                }
+            }
+        }
+
+        // LEFT가 player 0, RIGHT가 player 1
+        for (AttackNode attackNode : attackNodeArrayList)
+        {
+            if (attackNode.type == Node.DIRECTION_TYPE_RIGHT)
+            {
+                // 막거나 공격을 성공하면 일정 점수를 각 플레이어에게 더함.
+                if (attackNode.rect.overlaps(rightCursorRect))
+                {
+                    GameEnv.getInstance().addScore(10, 1);
+                    removeAttackNodes.add(attackNode);
+                }
+                else if (attackNode.getCenterPosition().x > Gdx.graphics.getWidth())
+                {
+                    GameEnv.getInstance().addScore(5, 0);
+                    removeAttackNodes.add(attackNode);
+                }
+            }
+            else {
+                if (attackNode.rect.overlaps(leftCursorRect))
+                {
+                    GameEnv.getInstance().addScore(10, 0);
+                    removeAttackNodes.add(attackNode);
+                }
+                else if (attackNode.getCenterPosition().x < 0)
+                {
+                    GameEnv.getInstance().addScore(5, 1);
+                    removeAttackNodes.add(attackNode);
                 }
             }
         }
@@ -181,6 +225,10 @@ public class PlayGame
         for (MusicNode node : removeNodes)
         {
             nodeArrayList.remove(node);
+        }
+        for (AttackNode attackNode : removeAttackNodes)
+        {
+            attackNodeArrayList.remove(attackNode);
         }
     }
 
@@ -222,9 +270,16 @@ public class PlayGame
             batch.draw(rightCursor, rightCursorRect.x, rightCursorRect.y);
             batch.draw(leftCursor, leftCursorRect.x, leftCursorRect.y);
 
+            // 음악 노드의 렌더링
             for (MusicNode node : nodeArrayList)
             {
                 batch.draw(node.getNodeSprite(), node.rect.x, node.rect.y);
+            }
+
+            // 공격 노드의 렌더링
+            for (AttackNode attackNode : attackNodeArrayList)
+            {
+                batch.draw(attackNode.getNodeSprite(), attackNode.rect.x, attackNode.rect.y);
             }
         }
         batch.end();
@@ -232,6 +287,84 @@ public class PlayGame
         stage.draw();
 
         update(delta);
+    }
+
+    private void createMusicNode(float delta) {
+        gamePlayTime += delta;
+
+        for(Object nodeObj : musicDataInfo.nodeTimeLineLeft){
+            Float energy = (Float)nodeObj;
+            if ((gamePlayTime - lastCreateNodeTime) >= 0.3)
+            {
+                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, energy * 10), MusicNode.DIRECTION_TYPE_LEFT));
+                musicDataInfo.nodeTimeLineLeft.remove(nodeObj);
+                break;
+            }
+        }
+
+        for(Object nodeObj : musicDataInfo.nodeTimeLineRight){
+            Float energy = (Float)nodeObj;
+            if ((gamePlayTime - lastCreateNodeTime) >= 0.3)
+            {
+                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, energy * 10), MusicNode.DIRECTION_TYPE_RIGHT));
+                musicDataInfo.nodeTimeLineRight.remove(nodeObj);
+                lastCreateNodeTime = gamePlayTime;
+                break;
+            }
+        }
+    }
+
+    private void moveNodePosition(float delta) {
+        ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
+
+        for (MusicNode node : nodeArrayList)
+        {
+            if (node.type == MusicNode.DIRECTION_TYPE_RIGHT)
+            {
+                node.rect.x += NODE_SPEED * delta;
+                if (node.rect.x > Gdx.graphics.getWidth())
+                {
+                    removeNodes.add(node);
+                }
+            }
+            else {
+                node.rect.x -= NODE_SPEED * delta;
+                if (node.rect.x < 0)
+                {
+                    removeNodes.add(node);
+                }
+            }
+        }
+
+        for (MusicNode node : removeNodes)
+        {
+            nodeArrayList.remove(node);
+        }
+    }
+
+    private void moveAttackNodePosition(float delta) {
+        for (AttackNode attackNode : attackNodeArrayList)
+        {
+            if (attackNode.type == MusicNode.DIRECTION_TYPE_RIGHT)
+                attackNode.rect.x += delta * ATTACK_NODE_SPEED;
+            else
+                attackNode.rect.x -= delta * ATTACK_NODE_SPEED;
+        }
+    }
+
+    /**
+     * 지정된 파일로부터 Json 데이터를 읽어옵니다. Json의 형식은 MusicDataInfo class에 의해 정해집니다.
+     *
+     * @param filepath Json파일의 위치를 의미합니다.
+     */
+    private void readJsonFromFile(String filepath) {
+        FileHandle handle = Gdx.files.internal(filepath);
+        String fileContent = handle.readString();
+        Json  json = new Json();
+        json.setElementType(MusicDataInfo.class, "nodeTimeLineLeft", Float.class);
+        json.setElementType(MusicDataInfo.class, "nodeTimeLineRight", Float.class);
+        musicDataInfo = json.fromJson(MusicDataInfo.class, fileContent);
+        Gdx.app.log("JSON", "Data name = " + musicDataInfo.title);
     }
 
     /**
@@ -276,62 +409,5 @@ public class PlayGame
     @Override
     public void esc() {
 
-    }
-
-    private void createMusicNode(float delta) {
-        gamePlayTime += delta;
-        for(Object nodeObj : musicDataInfo.nodeTimeLine){
-            float p = (Long)nodeObj;
-            p /= 1000;
-            if (gamePlayTime <= p && (p < (gamePlayTime + 0.1)))
-            {
-                nodeArrayList.add(new MusicNode(new Vector2(displayCenterPos.x, GameUtils.getInstance().getRandomInt(Gdx.graphics.getHeight())), 1));
-                musicDataInfo.nodeTimeLine.remove(nodeObj);
-                break;
-            }
-        }
-    }
-
-    private void moveNodePosition(float delta) {
-        ArrayList<MusicNode> removeNodes = new ArrayList<MusicNode>();
-
-        for (MusicNode node : nodeArrayList)
-        {
-            if (node.type == MusicNode.DIRECTION_TYPE_RIGHT)
-            {
-                node.rect.x += NODE_SPEED * delta;
-                if (node.rect.x > Gdx.graphics.getWidth())
-                {
-                    removeNodes.add(node);
-                }
-            }
-            else {
-                node.rect.x -= NODE_SPEED * delta;
-                if (node.rect.x < 0)
-                {
-                    removeNodes.add(node);
-                }
-            }
-        }
-
-        for (MusicNode node : removeNodes)
-        {
-            nodeArrayList.remove(node);
-        }
-    }
-
-    /**
-     * 지정된 파일로부터 Json 데이터를 읽어옵니다. Json의 형식은 MusicDataInfo class에 의해 정해집니다.
-     *
-     * @param filepath Json파일의 위치를 의미합니다.
-     */
-    private void readJsonFromFile(String filepath) {
-
-        FileHandle handle = Gdx.files.internal(filepath);
-        String fileContent = handle.readString();
-        Json  json = new Json();
-        json.setElementType(MusicDataInfo.class, "nodeTimeLine", Long.class);
-        musicDataInfo = json.fromJson(MusicDataInfo.class, fileContent);
-        Gdx.app.log("JSON", "Data name = " + musicDataInfo.title);
     }
 }
