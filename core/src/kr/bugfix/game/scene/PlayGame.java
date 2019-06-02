@@ -22,6 +22,7 @@ import kr.bugfix.game.datastruct.MusicDataInfo;
 import kr.bugfix.game.datastruct.Node;
 import kr.bugfix.game.system.GameEnv;
 import kr.bugfix.game.system.GameUtils;
+import kr.bugfix.game.system.SceneManager;
 
 public class PlayGame
         extends BaseScene
@@ -135,14 +136,27 @@ public class PlayGame
      */
     @Override
     public void update(float delta) {
+        gamePlayTime += delta;
 
         stage.act(delta);
 
-        moveCursorWithTouche(delta); // 커서이동
-        createMusicNode(delta);      // 음악노드 생성
-        hitNodeCheck(delta);         // 노드와 커서의 충돌처리
-        moveNodePosition(delta);     // 노드의 x축 이동
-        moveAttackNodePosition(delta);
+        // 게임 중
+        if (gamePlayTime < musicDataInfo.playTime) {
+            moveCursorWithTouche(delta); // 커서이동
+            createMusicNode(delta);      // 음악노드 생성
+            hitNodeCheck(delta);         // 노드와 커서의 충돌처리
+            moveNodePosition(delta);     // 노드의 x축 이동
+            moveAttackNodePosition(delta); // AttackNode의 이동
+        }
+        // 게임 끝, 잠시간의 휴식
+        else if (gamePlayTime < (musicDataInfo.playTime + 3))
+        {
+            ;
+        }
+        // 씬 change!!
+        else {
+            SceneManager.getInstance().changeScene(/**/);
+        }
     }
 
     /**
@@ -197,7 +211,7 @@ public class PlayGame
             if (attackNode.type == Node.DIRECTION_TYPE_RIGHT)
             {
                 // 막거나 공격을 성공하면 일정 점수를 각 플레이어에게 더함.
-                if (attackNode.rect.overlaps(rightCursorRect))
+                if (attackNode.type == Node.DIRECTION_TYPE_RIGHT && attackNode.rect.overlaps(rightCursorRect))
                 {
                     GameEnv.getInstance().addScore(10, 1);
                     removeAttackNodes.add(attackNode);
@@ -209,7 +223,7 @@ public class PlayGame
                 }
             }
             else {
-                if (attackNode.rect.overlaps(leftCursorRect))
+                if (attackNode.type == Node.DIRECTION_TYPE_LEFT && attackNode.rect.overlaps(leftCursorRect))
                 {
                     GameEnv.getInstance().addScore(10, 0);
                     removeAttackNodes.add(attackNode);
@@ -345,10 +359,7 @@ public class PlayGame
     private void moveAttackNodePosition(float delta) {
         for (AttackNode attackNode : attackNodeArrayList)
         {
-            if (attackNode.type == MusicNode.DIRECTION_TYPE_RIGHT)
-                attackNode.rect.x += delta * ATTACK_NODE_SPEED;
-            else
-                attackNode.rect.x -= delta * ATTACK_NODE_SPEED;
+            attackNode.move(delta, NODE_SPEED);
         }
     }
 

@@ -12,7 +12,6 @@ public class SceneManager
 
     private SceneManager() {
 
-
     }
 
     public static SceneManager getInstance() {

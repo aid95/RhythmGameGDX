@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class MusicDataInfo {
     public String title;
     public String singer;
+    public int playTime;
     public ArrayList nodeTimeLineLeft;
     public ArrayList nodeTimeLineRight;
 }
