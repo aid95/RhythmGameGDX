@@ -1,4 +1,4 @@
-package kr.bugfix.game.system;
+package kr.bugfix.game.Manager;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -8,7 +8,10 @@ import kr.bugfix.game.scene.BaseScene;
 
 public class SceneManager
 {
+
     private static SceneManager instance = null;
+
+    public BaseScene currentScene;
 
     private SceneManager() {
 
@@ -34,13 +37,13 @@ public class SceneManager
     }
 
     public void changeScene(BaseScene scene) {
-
         try {
-            scene.init();
+            currentScene = scene;
             entryScene.setScreen(scene);
         }
         catch (NullPointerException e) {
             Gdx.app.log("SCENEMANAGER", "Entry scene is NULL");
         }
     }
+
 }

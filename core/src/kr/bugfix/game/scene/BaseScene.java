@@ -7,12 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.RhythmGame;
-import kr.bugfix.game.system.SceneManager;
+import kr.bugfix.game.Manager.SceneManager;
 
 public abstract class BaseScene
         implements Screen
 {
-
     protected Stage stage;
     protected OrthographicCamera camera;
     protected StretchViewport viewport;
@@ -39,4 +38,5 @@ public abstract class BaseScene
 
     public abstract boolean eventTouchDown(int screenX, int screenY, int pointer, int button);
     public abstract boolean eventTouchDragged(int screenX, int screenY, int pointer);
+    public abstract boolean eventTouchUp(int screenX, int screenY, int pointer, int button);
 }

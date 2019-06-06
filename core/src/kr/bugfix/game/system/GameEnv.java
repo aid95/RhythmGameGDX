@@ -1,10 +1,17 @@
 package kr.bugfix.game.system;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+
+import java.util.ArrayList;
+
+import kr.bugfix.game.datastruct.StageInfo;
 
 public class GameEnv
 {
     private static GameEnv instance = null;
+
+    private ArrayList<StageInfo> stageInfos;
 
     public static GameEnv getInstance() {
 
@@ -21,6 +28,20 @@ public class GameEnv
     private GameEnv() {
         gameSpeed = 1;
         score = new Vector2();
+
+        stageInfos = new ArrayList<StageInfo>();
+        stageInfos.add(new StageInfo("01-Courtesy.json", "01-Courtesy.mp3", "01-Courtesy.jpg"));
+        stageInfos.add(new StageInfo("me_after_you.json", "me_after_you.mp3", "me_after_you.jpg"));
+    }
+
+    public StageInfo getStageInfo(int index)
+    {
+        return stageInfos.get(index);
+    }
+
+    public int getStageSize()
+    {
+        return stageInfos.size();
     }
 
     /**

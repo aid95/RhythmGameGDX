@@ -6,17 +6,18 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-import kr.bugfix.game.scene.PlayGame;
+import kr.bugfix.game.scene.IntroScene;
 import kr.bugfix.game.scene.BaseScene;
-import kr.bugfix.game.system.SceneManager;
+import kr.bugfix.game.Manager.SceneManager;
+import kr.bugfix.game.scene.MenuScene;
 
 public class RhythmGame
         extends Game
         implements InputProcessor
 {
-
     private static final int WIDTH = 2220;
     private static final int HEIGHT = 1080;
 
@@ -36,7 +37,7 @@ public class RhythmGame
         SceneManager.getInstance().setEntryScene(this);
 
         // Scene 등록
-        BaseScene nextScene = new PlayGame();
+        BaseScene nextScene = new IntroScene();
         setScreen(nextScene);
 
         // 입력작업 등록
@@ -82,6 +83,7 @@ public class RhythmGame
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        SceneManager.getInstance().currentScene.eventTouchUp(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
         return false;
     }
 

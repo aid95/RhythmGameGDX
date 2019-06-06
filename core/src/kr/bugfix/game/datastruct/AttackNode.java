@@ -1,5 +1,6 @@
 package kr.bugfix.game.datastruct;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -11,6 +12,7 @@ import kr.bugfix.game.system.GameUtils;
 public class AttackNode
     extends Node
 {
+
     // 0: up, 1: down
     private int upDownFlag;
 
@@ -25,7 +27,7 @@ public class AttackNode
         // Set direction
         this.type = type;
 
-        upDownFlag = GameUtils.getInstance().getRandomInt(2) - 1;
+        upDownFlag = GameUtils.getInstance().getRandomInt(10)%2;
     }
 
     public Sprite getNodeSprite() {
