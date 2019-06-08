@@ -12,6 +12,7 @@ public class GameEnv
     private static GameEnv instance = null;
 
     private ArrayList<StageInfo> stageInfos;
+    public int stageIndex;
 
     public static GameEnv getInstance() {
 
@@ -32,6 +33,8 @@ public class GameEnv
         stageInfos = new ArrayList<StageInfo>();
         stageInfos.add(new StageInfo("01-Courtesy.json", "01-Courtesy.mp3", "01-Courtesy.jpg"));
         stageInfos.add(new StageInfo("me_after_you.json", "me_after_you.mp3", "me_after_you.jpg"));
+
+        stageIndex = 0;
     }
 
     public StageInfo getStageInfo(int index)
@@ -43,6 +46,8 @@ public class GameEnv
     {
         return stageInfos.size();
     }
+
+    public StageInfo getCurrentStageInfo() { return stageInfos.get(stageIndex); }
 
     /**
      * 노드의 움직이는 속도를 정합니다.
@@ -92,4 +97,5 @@ public class GameEnv
         score.x = 0;
         score.y = 0;
     }
+
 }

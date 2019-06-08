@@ -33,7 +33,7 @@ public class NodeManager
     private float gamePlayTime;
 
     public void init(Batch batch) {
-        readJsonFromFile("01-Courtesy.json");
+        readJsonFromFile(GameEnv.getInstance().getCurrentStageInfo().jsonPath);
 
         lastCreateNodeTime = 0;
         gamePlayTime = 0;

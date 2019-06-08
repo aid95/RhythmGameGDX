@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import javax.xml.soap.Text;
 
 import kr.bugfix.game.Manager.ButtonManager;
+import kr.bugfix.game.Manager.SceneManager;
 import kr.bugfix.game.UI.Button;
 import kr.bugfix.game.datastruct.StageInfo;
 import kr.bugfix.game.system.GameEnv;
@@ -29,7 +30,6 @@ public class MenuScene
 
     ButtonManager buttonManager;
 
-    private int stageIndex;
 
     public MenuScene() {
         super();
@@ -54,14 +54,16 @@ public class MenuScene
         btn = new Button(BUTTON_EXIT, "exit_down.png", "exit_up.png");
         btn.setPosition(Gdx.graphics.getWidth()-100, 65);
         buttonManager.add(btn);
+        btn = new Button(BUTTON_START, "start_btn.png", "start_btn.png");
+        btn.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2-100);
+        buttonManager.add(btn);
 
-        stageIndex = 0;
-        changeThumbnail(stageIndex);
+        changeThumbnail(GameEnv.getInstance().stageIndex);
     }
 
     private void changeThumbnail(int index)
     {
-        StageInfo stageInfo = GameEnv.getInstance().getStageInfo(stageIndex);
+        StageInfo stageInfo = GameEnv.getInstance().getStageInfo(index);
         Texture tmp = new Texture(stageInfo.thumbnail);
         thumbnailTextrue = new TextureRegion(tmp, 0, 0, tmp.getWidth(), tmp.getHeight());
     }
@@ -97,22 +99,25 @@ public class MenuScene
                 break;
 
             case BUTTON_SELECT_RIGHT:
-                if (stageIndex < GameEnv.getInstance().getStageSize() - 1)
+                // 선곡 오른쪽 버튼
+                if (GameEnv.getInstance().stageIndex < GameEnv.getInstance().getStageSize() - 1)
                 {
-                    stageIndex++;
-                    changeThumbnail(stageIndex);
+                    GameEnv.getInstance().stageIndex++;
+                    changeThumbnail(GameEnv.getInstance().stageIndex);
                 }
                 break;
 
             case BUTTON_SELECT_LEFT:
-                if (stageIndex == 0) break;
+                // 선곡 왼쪽 버튼
+                if (GameEnv.getInstance().stageIndex == 0) break;
 
-                stageIndex--;
-                changeThumbnail(stageIndex);
+                GameEnv.getInstance().stageIndex--;
+                changeThumbnail(GameEnv.getInstance().stageIndex);
 
                 break;
 
             case BUTTON_START:
+                SceneManager.getInstance().changeScene(new PlayScene());
                 break;
         }
         return false;

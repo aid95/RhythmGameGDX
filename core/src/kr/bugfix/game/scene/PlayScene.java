@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import kr.bugfix.game.Manager.NodeManager;
 import kr.bugfix.game.Manager.SceneManager;
+import kr.bugfix.game.system.GameEnv;
 
 public class PlayScene
         extends BaseScene
@@ -73,10 +74,11 @@ public class PlayScene
      */
     @Override
     public void init() {
+        String mp3 = GameEnv.getInstance().getCurrentStageInfo().mp3Path;
+        music = Gdx.audio.newMusic(Gdx.files.internal(mp3));
+
         nodeManager = new NodeManager();
         nodeManager.init(batch);
-
-        music = Gdx.audio.newMusic(Gdx.files.internal("01-Courtesy.mp3"));
 
         // 화면 중앙 위치를 가지는 Vector2
         displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
@@ -128,7 +130,7 @@ public class PlayScene
         // 게임 끝, 잠시간의 휴식
         else if (gamePlayTime < (nodeManager.getCurrentMusicPlayTime() + 3))
         {
-            ;
+
         }
         // 씬 change!!
         else {
@@ -244,6 +246,7 @@ public class PlayScene
     @Override
     public void dispose() {
         backgroundImage.dispose();
+        music.dispose();
     }
 
     @Override
