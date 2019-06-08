@@ -17,8 +17,7 @@ import kr.bugfix.game.system.GameEnv;
 
 public class NodeManager
 {
-    private static final int NODE_SPEED = 1000;
-    private static final int ATTACK_NODE_SPEED = 1100;
+    private static final int NODE_SPEED = 500;
 
     /**
      * Json 사용을 위한 클래스

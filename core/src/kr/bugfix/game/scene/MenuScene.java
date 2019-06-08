@@ -40,11 +40,14 @@ public class MenuScene
 
     @Override
     public void init() {
+        // 게임시작전 점수를 0으로 초기화.
+        GameEnv.getInstance().resetScore();
+
         backgroundImage = new Texture(Gdx.files.internal("menu_bg.png"));
         textureRegion = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
 
-        Button btn;
         buttonManager = new ButtonManager();
+        Button btn;
         btn = new Button(BUTTON_SELECT_LEFT, "select_btn.png", "select_btn.png");
         btn.setPosition(120, Gdx.graphics.getHeight()/2);
         buttonManager.add(btn);
@@ -110,10 +113,8 @@ public class MenuScene
             case BUTTON_SELECT_LEFT:
                 // 선곡 왼쪽 버튼
                 if (GameEnv.getInstance().stageIndex == 0) break;
-
                 GameEnv.getInstance().stageIndex--;
                 changeThumbnail(GameEnv.getInstance().stageIndex);
-
                 break;
 
             case BUTTON_START:
@@ -163,4 +164,5 @@ public class MenuScene
     public void dispose() {
         backgroundImage.dispose();
     }
+
 }

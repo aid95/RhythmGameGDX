@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import kr.bugfix.game.Manager.FontManager;
 import kr.bugfix.game.Manager.NodeManager;
 import kr.bugfix.game.Manager.SceneManager;
 import kr.bugfix.game.system.GameEnv;
@@ -127,10 +128,10 @@ public class PlayScene
             nodeManager.update(delta);
             nodeManager.hitNodeCheck(delta, leftCursorRect, rightCursorRect);
         }
-        // 게임 끝, 잠시간의 휴식
         else if (gamePlayTime < (nodeManager.getCurrentMusicPlayTime() + 3))
         {
-
+            // 게임이 끝나고 잠시 딜레이를 주기위한 분기점
+            // 공회전
         }
         // 씬 change!!
         else {
@@ -194,6 +195,8 @@ public class PlayScene
             // Cursors
             batch.draw(rightCursor, rightCursorRect.x, rightCursorRect.y);
             batch.draw(leftCursor, leftCursorRect.x, leftCursorRect.y);
+
+            FontManager.getInstance().getPixelFont18().draw(batch, gamePlayTime.intValue() + " / " + nodeManager.getCurrentMusicPlayTime(), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
         }
         batch.end();
 
@@ -245,8 +248,10 @@ public class PlayScene
 
     @Override
     public void dispose() {
-        backgroundImage.dispose();
+        if (music.isPlaying())
+            music.pause();
         music.dispose();
+        backgroundImage.dispose();
     }
 
     @Override
