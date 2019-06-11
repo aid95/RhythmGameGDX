@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.RhythmGame;
-import kr.bugfix.game.Manager.SceneManager;
+import kr.bugfix.game.manager.SceneManager;
 
 public abstract class BaseScene
         implements Screen

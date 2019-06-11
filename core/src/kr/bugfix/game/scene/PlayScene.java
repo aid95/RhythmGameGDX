@@ -2,22 +2,26 @@ package kr.bugfix.game.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import kr.bugfix.game.Manager.FontManager;
-import kr.bugfix.game.Manager.NodeManager;
-import kr.bugfix.game.Manager.SceneManager;
+import kr.bugfix.game.manager.FontManager;
+import kr.bugfix.game.manager.NodeManager;
+import kr.bugfix.game.manager.SceneManager;
 import kr.bugfix.game.system.GameEnv;
 
 public class PlayScene
         extends BaseScene
 {
+
     // Sprite 사용하기!!!!
     private static final int MAX_TOUCH_COUNT = 2;
     private static final int CURSOR_OFFSET = 30;
@@ -29,6 +33,9 @@ public class PlayScene
 
     // 모든 노드를 관리하는 매니저
     private NodeManager nodeManager;
+
+    // 게임이 끝났을때 표시될 아이들을 위한 flag
+    private boolean isGameOver;
 
     /**
      * @var leftCursorPosY  왼쪽 커서의 Y 좌표를 가집합니다.
@@ -44,6 +51,9 @@ public class PlayScene
      */
     private Texture backgroundImage;
     private TextureRegion mainBackground;
+
+    // 폰트
+    private BitmapFont timeLimitTxtFont;
 
     /**
      * 게임 화면의 가운데 위치를 가집니다.
@@ -75,6 +85,8 @@ public class PlayScene
      */
     @Override
     public void init() {
+        isGameOver = false;
+
         String mp3 = GameEnv.getInstance().getCurrentStageInfo().mp3Path;
         music = Gdx.audio.newMusic(Gdx.files.internal(mp3));
 
@@ -107,6 +119,15 @@ public class PlayScene
         lastCreateNodeTime = 0.0f;
 
         delayStartMusic = displayCenterPos.x - CURSOR_OFFSET;
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 21;
+        parameter.color = Color.WHITE;
+        parameter.shadowColor = Color.BLACK;
+        parameter.shadowOffsetX = 2;
+        parameter.shadowOffsetY = 2;
+        timeLimitTxtFont = generator.generateFont(parameter);
     }
 
     /**
@@ -131,11 +152,11 @@ public class PlayScene
         else if (gamePlayTime < (nodeManager.getCurrentMusicPlayTime() + 3))
         {
             // 게임이 끝나고 잠시 딜레이를 주기위한 분기점
-            // 공회전
+            isGameOver = true;
         }
         // 씬 change!!
         else {
-            SceneManager.getInstance().changeScene(new MenuScene());
+            SceneManager.getInstance().changeScene(new ResultScene());
         }
     }
 
@@ -170,7 +191,7 @@ public class PlayScene
      */
     @Override
     public void render(float delta) {
-        if ( !isStart )
+        if (!isStart)
         {
             delayStartMusic -= CURSOR_SPEED * delta;
             if (delayStartMusic <= 0)
@@ -195,8 +216,12 @@ public class PlayScene
             // Cursors
             batch.draw(rightCursor, rightCursorRect.x, rightCursorRect.y);
             batch.draw(leftCursor, leftCursorRect.x, leftCursorRect.y);
-
-            FontManager.getInstance().getPixelFont18().draw(batch, gamePlayTime.intValue() + " / " + nodeManager.getCurrentMusicPlayTime(), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+            if (isGameOver) {
+                FontManager.getInstance().init().setShadow(Color.BLACK, 3, 3).setSize(50).getPixelFont().draw(batch, "GAME OVER!!", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+            }
+            else {
+                timeLimitTxtFont.draw(batch, gamePlayTime.intValue() + " / " + nodeManager.getCurrentMusicPlayTime(), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+            }
         }
         batch.end();
 
@@ -258,4 +283,5 @@ public class PlayScene
     public void esc() {
 
     }
+
 }

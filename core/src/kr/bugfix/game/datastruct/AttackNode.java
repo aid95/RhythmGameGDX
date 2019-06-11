@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import kr.bugfix.game.system.GameUtils;
 
 public class AttackNode
-    extends Node
+        extends Node
 {
 
     // 0: up, 1: down

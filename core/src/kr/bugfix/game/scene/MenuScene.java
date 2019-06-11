@@ -1,35 +1,31 @@
 package kr.bugfix.game.scene;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import javax.xml.soap.Text;
-
-import kr.bugfix.game.Manager.ButtonManager;
-import kr.bugfix.game.Manager.SceneManager;
-import kr.bugfix.game.UI.Button;
+import kr.bugfix.game.ui.ButtonWrapper;
+import kr.bugfix.game.manager.SceneManager;
+import kr.bugfix.game.ui.Button;
 import kr.bugfix.game.datastruct.StageInfo;
 import kr.bugfix.game.system.GameEnv;
 
 public class MenuScene
         extends BaseScene
 {
+    // 버튼 핸들링을 위한 버튼 아이디들의 레이블
     private final int BUTTON_SELECT_LEFT = 1;
     private final int BUTTON_SELECT_RIGHT = 2;
     private final int BUTTON_START = 3;
     private final int BUTTON_EXIT = 4;
 
-    Texture backgroundImage;
-    TextureRegion textureRegion;
+    // 배경화면을 위한 객체들
+    private Texture backgroundImage;
+    private TextureRegion textureRegion;
 
-
-    TextureRegion thumbnailTextrue;
-
-    ButtonManager buttonManager;
-
+    private TextureRegion thumbnailTextrue;
+    private ButtonWrapper buttonWrapper;
 
     public MenuScene() {
         super();
@@ -46,20 +42,20 @@ public class MenuScene
         backgroundImage = new Texture(Gdx.files.internal("menu_bg.png"));
         textureRegion = new TextureRegion(backgroundImage, 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
 
-        buttonManager = new ButtonManager();
+        buttonWrapper = new ButtonWrapper();
         Button btn;
         btn = new Button(BUTTON_SELECT_LEFT, "select_btn.png", "select_btn.png");
         btn.setPosition(120, Gdx.graphics.getHeight()/2);
-        buttonManager.add(btn);
+        buttonWrapper.add(btn);
         btn = new Button(BUTTON_SELECT_RIGHT, "select_btn.png", "select_btn.png");
         btn.setPosition(Gdx.graphics.getWidth()-120, Gdx.graphics.getHeight()/2);
-        buttonManager.add(btn);
+        buttonWrapper.add(btn);
         btn = new Button(BUTTON_EXIT, "exit_down.png", "exit_up.png");
         btn.setPosition(Gdx.graphics.getWidth()-100, 65);
-        buttonManager.add(btn);
+        buttonWrapper.add(btn);
         btn = new Button(BUTTON_START, "start_btn.png", "start_btn.png");
         btn.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2-100);
-        buttonManager.add(btn);
+        buttonWrapper.add(btn);
 
         changeThumbnail(GameEnv.getInstance().stageIndex);
     }
@@ -93,7 +89,7 @@ public class MenuScene
 
     @Override
     public boolean eventTouchUp(int screenX, int screenY, int pointer, int button) {
-        int bid = buttonManager.checkPress(screenX, screenY);
+        int bid = buttonWrapper.checkPress(screenX, screenY);
         Gdx.app.log("TOUCH EVENT", "ID:" + bid + " // X:Y" + screenX + ":" + screenY);
         switch (bid)
         {
@@ -134,7 +130,7 @@ public class MenuScene
         batch.begin();
         batch.draw(textureRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.draw(thumbnailTextrue, 298, 178, 365, 185);
-        buttonManager.render(batch);
+        buttonWrapper.render(batch);
         batch.end();
 
         update(delta);

@@ -1,16 +1,14 @@
-package kr.bugfix.game.Manager;
+package kr.bugfix.game.ui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 import java.util.ArrayList;
 
-import kr.bugfix.game.UI.Button;
-
-public class ButtonManager
+public class ButtonWrapper
 {
     private ArrayList<Button> buttons;
 
-    public ButtonManager()
+    public ButtonWrapper()
     {
         buttons = new ArrayList<Button>();
     }

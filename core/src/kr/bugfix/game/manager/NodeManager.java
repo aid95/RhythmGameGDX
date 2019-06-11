@@ -1,4 +1,4 @@
-package kr.bugfix.game.Manager;
+package kr.bugfix.game.manager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

@@ -1,4 +1,4 @@
-package kr.bugfix.game.Manager;
+package kr.bugfix.game.manager;
 
 public class GameManager
 {

@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import kr.bugfix.game.Manager.SceneManager;
+import kr.bugfix.game.manager.SceneManager;
 
 public class IntroScene
-    extends BaseScene
-    implements Screen
+        extends BaseScene
+        implements Screen
 {
     Texture backgroundImage;
     TextureRegion textureRegion;

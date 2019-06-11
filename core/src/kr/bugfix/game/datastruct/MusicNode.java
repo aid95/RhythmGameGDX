@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 
 public class MusicNode
-    extends Node
+        extends Node
 {
     public static final int DIRECTION_TYPE_RIGHT = 0;
     public static final int DIRECTION_TYPE_LEFT = 1;

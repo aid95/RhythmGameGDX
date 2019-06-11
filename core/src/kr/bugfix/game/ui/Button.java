@@ -1,4 +1,4 @@
-package kr.bugfix.game.UI;
+package kr.bugfix.game.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;

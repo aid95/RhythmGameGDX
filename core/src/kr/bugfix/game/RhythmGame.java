@@ -6,18 +6,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.scene.IntroScene;
 import kr.bugfix.game.scene.BaseScene;
-import kr.bugfix.game.Manager.SceneManager;
-import kr.bugfix.game.scene.MenuScene;
+import kr.bugfix.game.manager.SceneManager;
 
 public class RhythmGame
         extends Game
         implements InputProcessor
 {
+
     private static final int WIDTH = 2220;
     private static final int HEIGHT = 1080;
 
