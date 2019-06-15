@@ -1,1 +1,1 @@
-include 'android', 'core', ':library'
+include 'android', 'core', ':library', ':gdx-sqlite-android', ':gdx-sqlite'

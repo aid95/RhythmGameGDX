@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import kr.bugfix.game.scene.IntroScene;
@@ -17,8 +18,8 @@ public class RhythmGame
         implements InputProcessor
 {
 
-    private static final int WIDTH = 2220;
-    private static final int HEIGHT = 1080;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 480;
 
     public SpriteBatch batch;
     public OrthographicCamera camera;
@@ -28,9 +29,12 @@ public class RhythmGame
     public void create () {
         Gdx.input.setCatchBackKey(true);
 
-        camera = new OrthographicCamera(WIDTH, HEIGHT);           // 화면의 크기
+        camera = new OrthographicCamera();           // 화면의 크기
+        // camera.position.set(WIDTH/2, HEIGHT/2, 0);
+        camera.setToOrtho(false, WIDTH, HEIGHT);
         viewport = new StretchViewport(WIDTH, HEIGHT, camera);    // 게임 내부의 크기
         batch = new SpriteBatch();
+        batch.setProjectionMatrix(camera.combined);
 
         // 진입점이 되는 Scene을 지정
         SceneManager.getInstance().setEntryScene(this);
@@ -82,7 +86,9 @@ public class RhythmGame
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        SceneManager.getInstance().currentScene.eventTouchUp(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
+        Vector3 up = new Vector3(screenX, screenY, 0);
+        up = camera.unproject(up);
+        SceneManager.getInstance().getCurrentScene().eventTouchUp((int)up.x, (int)up.y, pointer, button);
         return false;
     }
 

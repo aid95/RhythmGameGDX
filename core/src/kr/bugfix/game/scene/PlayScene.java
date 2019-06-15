@@ -6,16 +6,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import kr.bugfix.game.manager.FontManager;
 import kr.bugfix.game.manager.NodeManager;
 import kr.bugfix.game.manager.SceneManager;
+import kr.bugfix.game.system.DBHelper;
 import kr.bugfix.game.system.GameEnv;
 
 public class PlayScene
@@ -54,6 +57,10 @@ public class PlayScene
 
     // 폰트
     private BitmapFont timeLimitTxtFont;
+    private BitmapFont gameOverTxtFont;
+
+    private GlyphLayout gameOverTxtLayout;
+    private GlyphLayout timeLimitTxtLayout;
 
     /**
      * 게임 화면의 가운데 위치를 가집니다.
@@ -94,12 +101,12 @@ public class PlayScene
         nodeManager.init(batch);
 
         // 화면 중앙 위치를 가지는 Vector2
-        displayCenterPos = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+        displayCenterPos = new Vector2(GameEnv.displayWidth/2, GameEnv.displayHeight/2);
 
         // 게임 커서 범위, 스프라이트 초기화
         rightCursor = new Sprite(new Texture("right_cursor.png"));
         rightCursorRect = new Rectangle();
-        rightCursorRect.x = Gdx.graphics.getWidth() - rightCursor.getWidth() - CURSOR_OFFSET;
+        rightCursorRect.x = GameEnv.displayWidth - rightCursor.getWidth() - CURSOR_OFFSET;
         rightCursorRect.y = rightCursor.getHeight()/2 - displayCenterPos.y;
         rightCursorRect.width = rightCursor.getWidth();
         rightCursorRect.height = rightCursor.getHeight();
@@ -120,6 +127,7 @@ public class PlayScene
 
         delayStartMusic = displayCenterPos.x - CURSOR_OFFSET;
 
+        // 사용할 폰트를 구성합니다.
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 21;
@@ -128,6 +136,18 @@ public class PlayScene
         parameter.shadowOffsetX = 2;
         parameter.shadowOffsetY = 2;
         timeLimitTxtFont = generator.generateFont(parameter);
+
+        parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 50;
+        parameter.color = Color.WHITE;
+        parameter.shadowColor = Color.BLACK;
+        parameter.shadowOffsetX = 2;
+        parameter.shadowOffsetY = 2;
+        gameOverTxtFont = generator.generateFont(parameter);
+        generator.dispose();
+
+        timeLimitTxtLayout = new GlyphLayout(timeLimitTxtFont, "0000:0000");
+        gameOverTxtLayout = new GlyphLayout(gameOverTxtFont, "GAME OVER!");
     }
 
     /**
@@ -151,8 +171,13 @@ public class PlayScene
         }
         else if (gamePlayTime < (nodeManager.getCurrentMusicPlayTime() + 3))
         {
+            // 게임이 종료된 시점에서 한번만 호출되기를 원함
+            if (!isGameOver) {
+                music.pause(); music.dispose();
+            }
             // 게임이 끝나고 잠시 딜레이를 주기위한 분기점
             isGameOver = true;
+            music.pause(); music.dispose();
         }
         // 씬 change!!
         else {
@@ -168,12 +193,15 @@ public class PlayScene
         {
             if (Gdx.input.isTouched(i))
             {
-                if (Gdx.input.getX(i) < displayCenterPos.x)
+                Vector3 vec = new Vector3();
+                vec.set(Gdx.input.getX(i), Gdx.input.getY(i), 0);
+                camera.unproject(vec);
+                if (vec.x < GameEnv.displayWidth/2)
                 {
-                    leftCursorRect.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (leftCursor.getHeight()/2) + (CURSOR_SPEED*delta);
+                    leftCursorRect.y = vec.y - (leftCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
                 else {
-                    rightCursorRect.y = Gdx.graphics.getHeight() - Gdx.input.getY(i) - (rightCursor.getHeight()/2) + (CURSOR_SPEED*delta);
+                    rightCursorRect.y = vec.y - (rightCursor.getHeight()/2) + (CURSOR_SPEED*delta);
                 }
             }
         }
@@ -193,6 +221,7 @@ public class PlayScene
     public void render(float delta) {
         if (!isStart)
         {
+            //
             delayStartMusic -= CURSOR_SPEED * delta;
             if (delayStartMusic <= 0)
             {
@@ -211,16 +240,20 @@ public class PlayScene
         {
             // Draw
             // Background
-            batch.draw(mainBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(mainBackground, 0, 0, GameEnv.displayWidth, GameEnv.displayHeight);
 
             // Cursors
             batch.draw(rightCursor, rightCursorRect.x, rightCursorRect.y);
             batch.draw(leftCursor, leftCursorRect.x, leftCursorRect.y);
+
+
             if (isGameOver) {
-                FontManager.getInstance().init().setShadow(Color.BLACK, 3, 3).setSize(50).getPixelFont().draw(batch, "GAME OVER!!", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+                // 게임오버 문자열 출력
+                gameOverTxtFont.draw(batch, gameOverTxtLayout, (GameEnv.displayWidth - gameOverTxtLayout.width)/2, (GameEnv.displayHeight + gameOverTxtLayout.height)/2);
             }
             else {
-                timeLimitTxtFont.draw(batch, gamePlayTime.intValue() + " / " + nodeManager.getCurrentMusicPlayTime(), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+                // 현재 남은 게임시간 출력
+                timeLimitTxtFont.draw(batch, String.format("%04d:%04d", gamePlayTime.intValue(), (int)nodeManager.getCurrentMusicPlayTime()), (GameEnv.displayWidth - timeLimitTxtLayout.width)/2, (GameEnv.displayHeight + timeLimitTxtLayout.height)/2);
             }
         }
         batch.end();

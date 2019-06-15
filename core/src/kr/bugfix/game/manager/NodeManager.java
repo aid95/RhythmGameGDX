@@ -56,7 +56,7 @@ public class NodeManager
         mainBatch.end();
     }
 
-    public float getCurrentMusicPlayTime()
+    public int getCurrentMusicPlayTime()
     {
         return musicDataInfo.playTime;
     }
@@ -73,7 +73,7 @@ public class NodeManager
         for (Object nodeObj : musicDataInfo.nodeTimeLineLeft) {
             Float energy = (Float) nodeObj;
             if ((gamePlayTime - lastCreateNodeTime) >= 0.3) {
-                nodeArrayList.add(new MusicNode(new Vector2(Gdx.graphics.getWidth()/2.0f, energy * 10), MusicNode.DIRECTION_TYPE_LEFT));
+                nodeArrayList.add(new MusicNode(new Vector2(GameEnv.displayWidth/2.0f, energy * 10), MusicNode.DIRECTION_TYPE_LEFT));
                 musicDataInfo.nodeTimeLineLeft.remove(nodeObj);
                 break;
             }
@@ -82,7 +82,7 @@ public class NodeManager
         for (Object nodeObj : musicDataInfo.nodeTimeLineRight) {
             Float energy = (Float) nodeObj;
             if ((gamePlayTime - lastCreateNodeTime) >= 0.3) {
-                nodeArrayList.add(new MusicNode(new Vector2(Gdx.graphics.getWidth()/2.0f, energy * 10), MusicNode.DIRECTION_TYPE_RIGHT));
+                nodeArrayList.add(new MusicNode(new Vector2(GameEnv.displayWidth/2.0f, energy * 10), MusicNode.DIRECTION_TYPE_RIGHT));
                 musicDataInfo.nodeTimeLineRight.remove(nodeObj);
                 lastCreateNodeTime = gamePlayTime;
                 break;
@@ -96,7 +96,7 @@ public class NodeManager
         for (MusicNode node : nodeArrayList) {
             if (node.type == MusicNode.DIRECTION_TYPE_RIGHT) {
                 node.rect.x += NODE_SPEED * delta;
-                if (node.rect.x > Gdx.graphics.getWidth()) {
+                if (node.rect.x > GameEnv.displayWidth) {
                     removeNodes.add(node);
                 }
             } else {
@@ -170,7 +170,7 @@ public class NodeManager
                     GameEnv.getInstance().addScore(10, 1); // Player1 점수 추가
                     removeAttackNodes.add(attackNode);
                 }
-                else if (attackNode.getCenterPosition().x > Gdx.graphics.getWidth())
+                else if (attackNode.getCenterPosition().x > GameEnv.displayWidth)
                 {
                     GameEnv.getInstance().addScore(5, 0); // Player0 점수 점수추가
                     removeAttackNodes.add(attackNode);

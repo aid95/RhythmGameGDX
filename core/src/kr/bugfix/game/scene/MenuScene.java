@@ -1,10 +1,12 @@
 package kr.bugfix.game.scene;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import kr.bugfix.game.system.DBHelper;
 import kr.bugfix.game.ui.ButtonWrapper;
 import kr.bugfix.game.manager.SceneManager;
 import kr.bugfix.game.ui.Button;
@@ -45,16 +47,16 @@ public class MenuScene
         buttonWrapper = new ButtonWrapper();
         Button btn;
         btn = new Button(BUTTON_SELECT_LEFT, "select_btn.png", "select_btn.png");
-        btn.setPosition(120, Gdx.graphics.getHeight()/2);
+        btn.setPosition(120, GameEnv.displayHeight/2);
         buttonWrapper.add(btn);
         btn = new Button(BUTTON_SELECT_RIGHT, "select_btn.png", "select_btn.png");
-        btn.setPosition(Gdx.graphics.getWidth()-120, Gdx.graphics.getHeight()/2);
+        btn.setPosition(GameEnv.displayWidth-120, GameEnv.displayHeight/2);
         buttonWrapper.add(btn);
         btn = new Button(BUTTON_EXIT, "exit_down.png", "exit_up.png");
-        btn.setPosition(Gdx.graphics.getWidth()-100, 65);
+        btn.setPosition(GameEnv.displayWidth-100, 65);
         buttonWrapper.add(btn);
         btn = new Button(BUTTON_START, "start_btn.png", "start_btn.png");
-        btn.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2-100);
+        btn.setPosition(GameEnv.displayWidth/2, GameEnv.displayHeight/2-100);
         buttonWrapper.add(btn);
 
         changeThumbnail(GameEnv.getInstance().stageIndex);
@@ -62,6 +64,7 @@ public class MenuScene
 
     private void changeThumbnail(int index)
     {
+        thumbnailTextrue = null;
         StageInfo stageInfo = GameEnv.getInstance().getStageInfo(index);
         Texture tmp = new Texture(stageInfo.thumbnail);
         thumbnailTextrue = new TextureRegion(tmp, 0, 0, tmp.getWidth(), tmp.getHeight());
@@ -128,8 +131,14 @@ public class MenuScene
     @Override
     public void render(float delta) {
         batch.begin();
-        batch.draw(textureRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(thumbnailTextrue, 298, 178, 365, 185);
+        batch.draw(textureRegion, 0, 0, GameEnv.displayWidth, GameEnv.displayHeight);
+
+        batch.draw(thumbnailTextrue,
+                (GameEnv.displayWidth/2) - (thumbnailTextrue.getRegionWidth()/2) + 50,
+                (GameEnv.displayHeight/2) - (thumbnailTextrue.getRegionHeight()/2) + 20,
+                365,
+                185);
+
         buttonWrapper.render(batch);
         batch.end();
 

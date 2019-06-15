@@ -25,7 +25,7 @@ public class IntroScene
     @Override
     public void render(float delta) {
         batch.begin();
-        batch.draw(textureRegion, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(textureRegion, 0, 0, 800, 480);
         batch.end();
 
         if (Gdx.input.justTouched()) {

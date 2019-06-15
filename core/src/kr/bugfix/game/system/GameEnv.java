@@ -14,6 +14,9 @@ public class GameEnv
     private ArrayList<StageInfo> stageInfos;
     public int stageIndex;
 
+    public static final int displayWidth = 800;
+    public static final int displayHeight = 480;
+
     public static GameEnv getInstance() {
 
         if ( instance == null )

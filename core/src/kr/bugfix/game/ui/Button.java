@@ -4,13 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Button
 {
 
-    private Sprite pressDown;
-    private Sprite pressUp;
+    private Texture pressDown;
+    private TextureRegion pressDownRegion;
+    private Texture pressUp;
+    private TextureRegion pressUpRegion;
 
     private Rectangle buttonRange;
 
@@ -19,8 +22,10 @@ public class Button
     private int buttonId;
 
     public Button(int buttonId, String pressDownImagePath, String pressUpImagePath) {
-        this.pressDown = new Sprite(new Texture(Gdx.files.internal(pressDownImagePath)));
-        this.pressUp = new Sprite(new Texture(Gdx.files.internal(pressUpImagePath)));
+        this.pressDown = new Texture(Gdx.files.internal(pressDownImagePath));
+        this.pressDownRegion = new TextureRegion(pressDown, 0, 0, pressDown.getWidth(), pressDown.getHeight());
+        this.pressUp = new Texture(Gdx.files.internal(pressUpImagePath));
+        this.pressUpRegion = new TextureRegion(pressUp, 0, 0, pressUp.getWidth(), pressUp.getHeight());
 
         buttonRange = new Rectangle();
         buttonRange.width = pressUp.getWidth();
@@ -48,8 +53,8 @@ public class Button
 
     public void render(Batch batch)
     {
-        // 눌린상태와 구분하여 sprite를 그림.
-        Sprite curSprite = (isPress)? pressDown: pressUp;
+        // 눌린상태와 구분하여 Texture를 그림.
+        TextureRegion curSprite = (isPress)? pressDownRegion: pressUpRegion;
         batch.draw(curSprite, buttonRange.x, buttonRange.y);
     }
 
