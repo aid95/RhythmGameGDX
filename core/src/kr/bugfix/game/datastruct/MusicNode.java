@@ -44,6 +44,15 @@ public class MusicNode
         rect.y = y;
     }
 
+    public void setPosition(float x, float y) {
+        rect.x = x;
+        rect.y = y;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public Vector2 getCenterPosition() {
         return new Vector2(rect.x + rect.width/2, rect.y + rect.height/2);
     }
